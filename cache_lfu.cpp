@@ -54,6 +54,16 @@ struct Cache {
         cache.sort(cmp);
     };
 
+    bool IsInCache(size_t key) {
+        auto pos = std::find_if(cache.begin(), cache.end(),
+                                [key](std::pair<size_t, Page> const &b) {
+                                    return b.second.GetKey() == key;
+                                });
+        if (pos != cache.end()) { return true; }
+        else
+            return false;
+    };
+
     //lru algorithm
 
     void update_cache(Page &p) {
@@ -93,7 +103,21 @@ Internet create_internet(std::size_t size) {
     return internet;
 }
 
-int main() {
+namespace tcolors {
+    constexpr std::string_view red = "\033[31m";
+    constexpr std::string_view green = "\033[32m";
+    constexpr std::string_view reset = "\033[0m";
+
+}
+
+void myassert(bool value, std::string test_name) {
+    if (value) { std::cout << tcolors::green << "test " << test_name << " passed!" << tcolors::reset << std::endl; }
+    else
+        std::cout << tcolors::red << "test " << test_name << " failed!" << tcolors::reset << std::endl;
+}
+
+
+void test1() {
     size_t n = 20;
 
     Internet mini_internet = create_internet(n);
@@ -119,5 +143,16 @@ int main() {
         i.second.statistics();
     }
 
+    myassert(mycache.IsInCache(1), "1 is in cache");
+    myassert(mycache.IsInCache(3), "3 is in cache");
+    myassert(mycache.IsInCache(6), "6 is in cache");
+    myassert(mycache.IsInCache(7), "7 is in cache");
+    myassert(mycache.IsInCache(8), "8 is in cache");
+    myassert(!mycache.IsInCache(9), "9 is not in cache");
+}
+
+
+int main() {
+    test1();
     return 1;
 }
